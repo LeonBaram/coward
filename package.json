@@ -1,0 +1,20 @@
+{
+  "name": "coward",
+  "version": "1.0.0",
+  "description": "The sound of crashing waves and rolling dice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeonBaram/coward.git"
+  },
+  "keywords": [],
+  "author": "Leon Baram",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LeonBaram/coward/issues"
+  },
+  "homepage": "https://github.com/LeonBaram/coward#readme"
+}
