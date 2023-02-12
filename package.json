@@ -16,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/LeonBaram/coward/issues"
   },
-  "homepage": "https://github.com/LeonBaram/coward#readme"
+  "homepage": "https://github.com/LeonBaram/coward#readme",
+  "dependencies": {
+    "@discordjs/opus": "^0.8.0",
+    "discord-player": "^5.4.0",
+    "discord.js": "^14.7.1",
+    "esbuild": "0.17.7"
+  }
 }
