@@ -4,7 +4,7 @@
   "description": "The sound of crashing waves and rolling dice",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild main.ts --bundle --outfile=index.js --platform=node",
+    "build": "esbuild main.ts --bundle --outdir=dist --platform=node",
     "deployCommands": "esbuild deploy-commands.ts --bundle --outfile=deploy-commands.js --platform=node && node deploy-commands.js",
     "dev": "npm run build && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
