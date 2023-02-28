@@ -15,6 +15,7 @@ import { Player } from "discord-player";
 const { Guilds, GuildVoiceStates, GuildMessages } = GatewayIntentBits;
 
 const client = new Client({ intents: [Guilds, GuildVoiceStates, GuildMessages] });
+const player = new Player(client);
 
 client.once(Events.ClientReady, (client) =>
 	console.log(`client is ready; logged in as ${client.user.tag}`));
@@ -36,9 +37,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	try {
 		type Command = {
 			data: SlashCommandBuilder,
-			execute: (interaction: ChatInputCommandInteraction) => Promise<undefined>,
+			execute: (
+				interaction: ChatInputCommandInteraction,
+				player: Player
+			) => Promise<InteractionResponse<boolean>>,
 		};
-		await (commands[commandName] as Command).execute(interaction);
+		await (commands[commandName] as Command).execute(interaction, player);
 	} catch (error) {
 		console.error(error);
 		await interaction.reply({
