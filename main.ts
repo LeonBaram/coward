@@ -1,4 +1,10 @@
-import { ChatInputCommandInteraction, Client, Events, GatewayIntentBits, SlashCommandBuilder } from "discord.js";
+import {
+	ChatInputCommandInteraction,
+	Client,
+	Events,
+	GatewayIntentBits,
+	SlashCommandBuilder
+} from "discord.js";
 import { token } from "./config.json";
 import * as commands from "./commands";
 
