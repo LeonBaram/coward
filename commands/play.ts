@@ -51,8 +51,5 @@ export const execute = async (
     });
   }
 
-  return interaction.reply({
-    content: `playing track "bepis" in "joe mama"`,
-    ephemeral: true,
-  });
+  return interaction.reply(`playing track "bepis" in "joe mama"`);
 };
