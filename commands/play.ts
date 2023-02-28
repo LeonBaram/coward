@@ -1,4 +1,4 @@
-import type { Player } from "discord-player";
+import { Player, QueryType } from "discord-player";
 import { SlashCommandBuilder } from "discord.js";
 import type {
   ChatInputCommandInteraction,
@@ -8,7 +8,11 @@ import type {
 
 export const data = new SlashCommandBuilder()
   .setName("play")
-  .setDescription("add track to start of queue and play it, or unpause current track");
+  .setDescription("play audio from youtube link")
+  .addStringOption((option) =>
+    option.setName("link")
+      .setDescription("link to youtube video")
+      .setRequired(true));
 
 export const execute = async (
   interaction: ChatInputCommandInteraction,
@@ -39,17 +43,36 @@ export const execute = async (
     });
   }
 
-  const query = interaction.options.getString("query");
+  const link = interaction.options.getString("link")!;
 
-  if (query === null) {
-    // unpause current track
-  } else {
-    const queue = player.createQueue(interaction.guild, {
-      metadata: {
-        channel: interaction.channel,
-      },
-    });
+  const queue = player.createQueue(interaction.guild, {
+    metadata: {
+      channel: interaction.channel,
+    },
+    ytdlOptions: {
+      filter: 'audioonly',
+    },
+  });
+
+  try {
+    if (!queue.connection) {
+      await queue.connect(user.voice.channel);
+    }
+  } catch {
+    queue.destroy();
+    return interaction.reply(`could not join your voice channel`);
   }
 
-  return interaction.reply(`playing track "bepis" in "joe mama"`);
+  const track = await player.search(link, {
+    requestedBy: interaction.user,
+    searchEngine: QueryType.YOUTUBE_VIDEO,
+  }).then(x => x.tracks[0]);
+
+  if (!track) {
+    return interaction.reply(`could not play audio from video at ${link}`);
+  }
+
+  queue.play(track);
+
+  return interaction.reply(`playing audio from "${link}" in "${user.voice.channel}"`);
 };
