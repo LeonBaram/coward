@@ -1,12 +1,16 @@
 import {
-	ChatInputCommandInteraction,
 	Client,
 	Events,
 	GatewayIntentBits,
 	SlashCommandBuilder
 } from "discord.js";
+import type {
+	ChatInputCommandInteraction,
+	InteractionResponse
+} from "discord.js";
 import { token } from "./config.json";
 import * as commands from "./commands";
+import { Player } from "discord-player";
 
 const { Guilds, GuildVoiceStates, GuildMessages } = GatewayIntentBits;
 
