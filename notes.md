@@ -1,4 +1,10 @@
-# Commands to Implement
+# Notes
+
+### Invite Link
+
+https://discord.com/api/oauth2/authorize?client_id=1074424105949999236&permissions=2150640640&scope=bot%20applications.commands
+
+## Commands to Implement
 
 play
 - argument: link to youtube video
