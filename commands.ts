@@ -74,4 +74,18 @@ commands.togglePause = {
     return reply(bot.paused ? "paused" : "unpaused");
   },
 }
+
+commands.clearQueue = {
+  data: new SlashCommandBuilder()
+    .setName("clear")
+    .setDescription("clear the queue"),
+  execute(bot, interaction) {
+    const reply = (content: string, ephemeral: boolean = true) =>
+      interaction.reply({ content, ephemeral });
+
+    bot.queue.clear();
+    return reply("cleared queue");
+  }
+}
+
 export default commands;
