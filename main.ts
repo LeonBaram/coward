@@ -16,7 +16,7 @@ import { Bot } from "./Bot";
 
 import { token } from "./config.json";
 
-import * as commands from "./commands";
+import commands from "./commands";
 
 const { Guilds, GuildVoiceStates, GuildMessages } = GatewayIntentBits;
 
