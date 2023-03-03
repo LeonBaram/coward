@@ -25,6 +25,10 @@ export class Queue<T> extends EventEmitter {
 		super();
 	}
 
+	get current(): T | null {
+		return this.ended ? null : this.array[this.index];
+	}
+
 	get index(): number {
 		return this._index;
 	}
