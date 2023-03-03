@@ -4,11 +4,7 @@ import {
 	GatewayIntentBits,
 } from "discord.js";
 
-import type {
-	ChatInputCommandInteraction,
-	GuildMember,
-	InteractionResponse
-} from "discord.js";
+import type { GuildMember } from "discord.js";
 
 import { joinVoiceChannel } from "@discordjs/voice";
 
@@ -52,11 +48,6 @@ client.on(Events.GuildDelete, (guild) => {
 })
 
 client.login(token);
-
-type CommandInteraction = ChatInputCommandInteraction;
-type CommandResponse = Promise<InteractionResponse<boolean>>;
-export type CommandHandler =
-	(botInstance: Bot, interaction: CommandInteraction) => CommandResponse;
 
 client.on(Events.InteractionCreate, (interaction) => {
 	if (!interaction.isChatInputCommand()) {
