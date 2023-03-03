@@ -21,9 +21,13 @@
   },
   "homepage": "https://github.com/LeonBaram/coward#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.8.0",
-    "discord-player": "^5.4.0",
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/voice": "^0.14.0",
     "discord.js": "^14.7.1",
-    "esbuild": "0.17.7"
+    "esbuild": "0.17.7",
+    "ffmpeg-static": "^5.1.0",
+    "sodium": "^3.0.2",
+    "ytdl-core": "^4.11.2",
+    "ytpl": "^2.3.0"
   }
 }
