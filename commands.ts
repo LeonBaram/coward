@@ -21,7 +21,7 @@ namespace Command {
 
 const commands: Record<string, Command.Entry> = {};
 
-commands.play = {
+commands.addToQueue = {
   data: new SlashCommandBuilder()
     .setName("play")
     .setDescription("add video to queue")
