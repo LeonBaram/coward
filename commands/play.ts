@@ -1,78 +1,40 @@
-import { Player, QueryType } from "discord-player";
 import { SlashCommandBuilder } from "discord.js";
-import type {
-  ChatInputCommandInteraction,
-  GuildMember,
-  InteractionResponse
-} from "discord.js";
+
+import ytdl from "ytdl-core";
+
+import type { CommandHandler } from "../main";
 
 export const data = new SlashCommandBuilder()
   .setName("play")
-  .setDescription("play audio from youtube link")
+  .setDescription("add video to queue")
   .addStringOption((option) =>
-    option.setName("link")
-      .setDescription("link to youtube video")
+    option.setName("url")
+      .setDescription("url of youtube video")
       .setRequired(true));
 
-export const execute = async (
-  interaction: ChatInputCommandInteraction,
-  player: Player
-): Promise<InteractionResponse<boolean>> => {
-  if (!interaction.guild) {
-    return interaction.reply({
-      content: "you must be in a server to use this command",
-      ephemeral: true,
-    });
+export const execute: CommandHandler = async (bot, interaction) => {
+  const reply = (content: string, ephemeral: boolean = true) =>
+    interaction.reply({ content, ephemeral });
+
+  const url = interaction.options.getString("url");
+
+  if (url === null) {
+    return reply(`the /play command requires a url`);
   }
 
-  const user = interaction.member as GuildMember;
+  const urlIsValid = ytdl.validateURL(url);
 
-  if (!user.voice.channel) {
-    return interaction.reply({
-      content: "you must be in a voice chat to use this command",
-      ephemeral: true,
-    });
+  if (urlIsValid === false) {
+    return reply(`could not get a valid video ID from this url: "${url}"`);
   }
 
-  const botChannel = interaction.guild?.members.me?.voice.channel;
+  const { length } = bot.queue;
 
-  if (botChannel && (botChannel.id !== user.voice.channel!.id)) {
-    return interaction.reply({
-      content: `already playing in "${botChannel.name}"`,
-      ephemeral: true,
-    });
+  bot.queue.push(url);
+
+  if (length === 0) {
+    return reply(`now playing audio from ${url}`);
+  } else {
+    return reply(`added ${url} to queue`);
   }
-
-  const link = interaction.options.getString("link")!;
-
-  const queue = player.createQueue(interaction.guild, {
-    metadata: {
-      channel: interaction.channel,
-    },
-    ytdlOptions: {
-      filter: 'audioonly',
-    },
-  });
-
-  try {
-    if (!queue.connection) {
-      await queue.connect(user.voice.channel);
-    }
-  } catch {
-    queue.destroy();
-    return interaction.reply(`could not join your voice channel`);
-  }
-
-  const track = await player.search(link, {
-    requestedBy: interaction.user,
-    searchEngine: QueryType.YOUTUBE_VIDEO,
-  }).then(x => x.tracks[0]);
-
-  if (!track) {
-    return interaction.reply(`could not play audio from video at ${link}`);
-  }
-
-  queue.play(track);
-
-  return interaction.reply(`playing audio from "${link}" in "${user.voice.channel}"`);
 };
