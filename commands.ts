@@ -58,4 +58,20 @@ commands.play = {
   }
 };
 
+commands.togglePause = {
+  data: new SlashCommandBuilder()
+    .setName("pauseorresume")
+    .setDescription("pause or unpause current track"),
+  execute(bot, interaction) {
+    const reply = (content: string, ephemeral: boolean = true) =>
+      interaction.reply({ content, ephemeral });
+
+    if (bot.queue.isEmpty) {
+      return reply("nothing to pause; queue is empty");
+    }
+
+    bot.paused = !bot.paused;
+    return reply(bot.paused ? "paused" : "unpaused");
+  },
+}
 export default commands;
