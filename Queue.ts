@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
 
 interface QueueEvents {
-	'end': () => void;
-	'grow': () => void;
+	'empty': () => void;
+	'nonempty': () => void;
 }
 
 export interface Queue<T> {
@@ -26,7 +26,7 @@ export class Queue<T> extends EventEmitter {
 	}
 
 	get current(): T | null {
-		return this.ended ? null : this.array[this.index];
+		return this.isEmpty ? null : this.array[this.index];
 	}
 
 	get index(): number {
@@ -37,7 +37,7 @@ export class Queue<T> extends EventEmitter {
 		return this.array.length;
 	}
 
-	get ended(): boolean {
+	get isEmpty(): boolean {
 		return this.index >= this.length;
 	}
 
@@ -48,22 +48,22 @@ export class Queue<T> extends EventEmitter {
 	}
 
 	private modify(func: () => void): void {
-		const wasEnded = this.ended;
+		const wasEmpty = this.isEmpty;
 
 		func();
 
 		if (this.index < 0) {
 			this._index = 0;
 		}
-		if (this.ended) {
+		if (this.isEmpty) {
 			this._index = this.length - 1;
 		}
 
-		if (wasEnded !== this.ended) {
-			if (this.ended) {
-				this.emit('end');
+		if (wasEmpty !== this.isEmpty) {
+			if (this.isEmpty) {
+				this.emit('empty');
 			} else {
-				this.emit('grow');
+				this.emit('nonempty');
 			}
 		}
 	}
