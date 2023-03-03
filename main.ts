@@ -63,11 +63,14 @@ client.on(Events.InteractionCreate, (interaction) => {
 		return;
 	}
 
+	const reply = (content: string, ephemeral: boolean = true) => {
+		interaction.reply({ content, ephemeral });
+	};
+
 	const { commandName, guildId } = interaction;
 
 	if (guildId === null) {
-		interaction.reply("you must be in a server to use this bot");
-		return;
+		return reply("you must be in a server to use this bot");
 	}
 
 	const bot = botInstances.get(guildId) ?? null;
@@ -75,37 +78,25 @@ client.on(Events.InteractionCreate, (interaction) => {
 	const botAsGuildMember = interaction.guild?.members.me ?? null;
 
 	if (bot === null || botAsGuildMember === null) {
-		interaction.reply("this bot has not been invited to your server");
-		return;
+		return reply("this bot has not been invited to your server");
 	}
 
 	if (!(commandName in commands)) {
 		const errorStr = `cannot execute command ${commandName}; no such command`;
 		console.error(errorStr);
-		interaction.reply({
-			content: errorStr,
-			ephemeral: true,
-		});
-		return;
+		return reply(errorStr);
 	}
 
 	const user = interaction.member as GuildMember;
 
 	if (user.voice.channelId === null) {
-		interaction.reply({
-			content: `you must be in a voice channel to use this bot`,
-			ephemeral: true,
-		});
-		return;
+		return reply(`you must be in a voice channel to use this bot`);
 	}
 
 	const botVoiceChannel = botAsGuildMember.voice.channel;
 
 	if (botVoiceChannel !== null && user.voice.channelId !== botVoiceChannel.id) {
-		interaction.reply({
-			content: `the bot is busy in ${botVoiceChannel}`,
-			ephemeral: true,
-		});
+		return reply(`the bot is busy in ${botVoiceChannel}`);
 	}
 
 	if (botVoiceChannel === null) {
@@ -119,12 +110,11 @@ client.on(Events.InteractionCreate, (interaction) => {
 	try {
 		const execute = commands[commandName].execute as CommandHandler;
 		execute(bot, interaction);
+		console.log({ interaction });
+		return;
 	} catch (error) {
 		console.error({ bot, interaction });
 		console.error(error);
-		interaction.reply({
-			content: `there was an error while executing command "${commandName}"`,
-			ephemeral: true,
-		});
+		return reply(`there was an error while executing command "${commandName}"`);
 	}
 });
