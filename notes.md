@@ -4,10 +4,10 @@
 
 https://discord.com/api/oauth2/authorize?client_id=1074424105949999236&permissions=2150640640&scope=bot%20applications.commands
 
-## Commands to Implement
+## Command structure
 
 play
-- argument: link to youtube video
+- argument: url of youtube video
 - adds its audio track to end of queue
 
 pause/resume
