@@ -1,91 +1,89 @@
 import {
-	AudioPlayerStatus,
-	createAudioPlayer,
-	createAudioResource,
-	getVoiceConnection
+  AudioPlayerStatus,
+  AudioResource,
+  createAudioPlayer,
+  createAudioResource,
 } from "@discordjs/voice";
 
-import { AudioPlayer } from "@discordjs/voice";
-
+import type { AudioPlayer } from "@discordjs/voice";
 import ytdl from "ytdl-core";
 
-import { Queue } from "./Queue";
+type Status = "idle" | "paused" | "playing";
 
 export class Bot {
-	player: AudioPlayer = createAudioPlayer();
-	queue: Queue<string> = new Queue();
-	loopQueue: boolean = false;
-	loopCurrentTrack: boolean = false;
-	private _paused: boolean = false;
+  static fetchResource(url: string): AudioResource | null {
+    try {
+      const stream = ytdl(url, { filter: "audioonly" });
 
-	constructor(readonly guildId: string) {
-		const { player, queue } = this;
+      return createAudioResource(stream);
+    }
+    catch (error) {
+      console.error(error);
+      console.error({ url });
 
-		queue.on('nonempty', () => this.attemptPlayback());
+      return null;
+    }
+  }
 
-		player.on(AudioPlayerStatus.Idle, () => {
-			if (!this.loopCurrentTrack) {
-				queue.index++;
-			}
-			if (this.loopQueue) {
-				queue.index %= queue.length;
-			}
-			this.attemptPlayback();
-		});
+  audioPlayer: AudioPlayer = createAudioPlayer();
 
-		player.on(AudioPlayerStatus.Paused, () => {
-			this._paused = true;
-		});
+  trackUrls: string[] = [];
+  index: number = 0;
 
-		player.on(AudioPlayerStatus.Playing, () => {
-			this._paused = false;
-		});
-	}
+  loopQueue: boolean = false;
+  loopCurrentTrack: boolean = false;
 
-	get paused(): boolean {
-		return this._paused;
-	}
+  private _status: Status = "idle";
 
-	get playing(): boolean {
-		return !this._paused;
-	}
+  get status(): Status {
+    return this._status;
+  }
 
-	set paused(val: boolean) {
-		if (val) {
-			this.player.pause();
-		} else {
-			this.player.unpause();
-		}
-	}
+  get currentUrl(): string | null {
+    return this.trackUrls.at(this.index) ?? null;
+  }
 
-	set playing(val: boolean) {
-		if (val) {
-			this.player.unpause();
-		} else {
-			this.player.pause();
-		}
-	}
+  constructor(readonly guildId: string) {
+    this.audioPlayer.on(AudioPlayerStatus.Paused, () => this._status = "paused");
 
-	private attemptPlayback() {
-		const { guildId, player, queue } = this;
+    this.audioPlayer.on(AudioPlayerStatus.Playing, () => this._status = "playing");
 
-		const connection = getVoiceConnection(guildId) ?? null;
+    this.audioPlayer.on(AudioPlayerStatus.Idle, () => {
+      this._status = "idle";
 
-		if (connection !== null) {
-			while (queue.length > 0) {
-				try {
-					const url = queue.current!;
-					const stream = ytdl(url, { filter: 'audioonly' });
-					const resource = createAudioResource(stream);
+      if (!this.loopCurrentTrack) {
+        this.index++;
+      }
 
-					connection.subscribe(player);
-					player.play(resource);
-					return;
-				} catch (err) {
-					console.error(err);
-					queue.remove();
-				}
-			}
-		}
-	}
+      if (this.index < 0) {
+        this.index = this.trackUrls.length;
+      }
+
+      if (this.loopQueue) {
+        this.index %= this.trackUrls.length;
+      }
+      else if (this.index > this.trackUrls.length) {
+        this.index = this.trackUrls.length;
+      }
+
+      this.playCurrentTrack();
+    });
+  }
+
+  playCurrentTrack(): boolean {
+    const url = this.currentUrl;
+
+    if (url === null) {
+      return false;
+    }
+
+    const resource = Bot.fetchResource(url);
+
+    if (resource === null) {
+      return false;
+    }
+
+    this.audioPlayer.play(resource);
+    return true;
+  }
 }
