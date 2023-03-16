@@ -6,7 +6,7 @@ https://discord.com/api/oauth2/authorize?client_id=1074424105949999236&permissio
 
 ## Command structure
 
-play
+add
 - argument: url of youtube video
 - adds its audio track to end of queue
 
@@ -36,7 +36,7 @@ shuffle
 loop
 - loops current audio track
 
-looplist
+loopqueue
 - loops the queue
 
 would be nice:
