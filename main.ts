@@ -12,7 +12,7 @@ import { Bot } from "./Bot";
 
 import { token } from "./config.json";
 
-import commands from "./commands";
+import { commands } from "./commands";
 
 const { Guilds, GuildVoiceStates, GuildMessages } = GatewayIntentBits;
 
@@ -61,7 +61,8 @@ client.on(Events.InteractionCreate, (interaction) => {
 	const { commandName, guildId } = interaction;
 
 	if (guildId === null) {
-		return reply("you must be in a server to use this bot");
+		reply("you must be in a server to use this bot");
+		return;
 	}
 
 	const bot = botInstances.get(guildId) ?? null;
@@ -75,19 +76,22 @@ client.on(Events.InteractionCreate, (interaction) => {
 	if (!(commandName in commands)) {
 		const errorStr = `cannot execute command ${commandName}; no such command`;
 		console.error(errorStr);
-		return reply(errorStr);
+		reply(errorStr);
+		return;
 	}
 
 	const user = interaction.member as GuildMember;
 
 	if (user.voice.channelId === null) {
-		return reply(`you must be in a voice channel to use this bot`);
+		reply(`you must be in a voice channel to use this bot`);
+		return;
 	}
 
 	const botVoiceChannel = botAsGuildMember.voice.channel;
 
 	if (botVoiceChannel !== null && user.voice.channelId !== botVoiceChannel.id) {
-		return reply(`the bot is busy in ${botVoiceChannel}`);
+		reply(`the bot is busy in ${botVoiceChannel}`);
+		return;
 	}
 
 	if (botVoiceChannel === null) {
@@ -95,17 +99,17 @@ client.on(Events.InteractionCreate, (interaction) => {
 			channelId: user.voice.channelId,
 			guildId: user.guild.id,
 			adapterCreator: user.guild.voiceAdapterCreator,
-		});
+		}).subscribe(bot.audioPlayer);
 	}
 
 	try {
-		const execute = commands[commandName].execute as CommandHandler;
-		execute(bot, interaction);
+		commands[commandName].execute(bot, interaction);
 		console.log({ interaction });
 		return;
 	} catch (error) {
 		console.error({ bot, interaction });
 		console.error(error);
-		return reply(`there was an error while executing command "${commandName}"`);
+		reply(`there was an error while executing command "${commandName}"`);
+		return;
 	}
 });

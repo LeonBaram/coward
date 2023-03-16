@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "esbuild main.ts --bundle --outdir=dist --platform=node",
-    "deployCommands": "esbuild deploy-commands.ts --bundle --outfile=dist/deploy-commands.js --platform=node && node dist/deploy-commands.js",
+    "deployCommands": "esbuild deploy-commands.ts --outdir=dist --platform=node && node dist/deploy-commands.js",
     "dev": "npm run build && node dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
